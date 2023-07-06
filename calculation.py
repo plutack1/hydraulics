@@ -40,7 +40,7 @@ DIST_OF_SPRINKLER_ON_BRANCH_LINES = LENGTH / no_of_sprinkler_on_branch_lines
 calc_coverage_area = dist_between_branch_lines * DIST_OF_SPRINKLER_ON_BRANCH_LINES
 # variables
 # density = (0.1 * (DESIGN_AREA - 2500) / 2500) + 0.2
-density = 0.15
+density = 0.2
 calc_coverage_area_check = True
 calc_design_area_check = True
 addition = False
@@ -227,16 +227,20 @@ for m in range(1, no_of_branch_lines + 1):
                 p_drop = pressure_drop(q=flow_rate_end, l_eqv=length, d=cr_line_int_dia)
                 pressure_add = all_pressure[len(all_pressure) - 2] + p_drop
                 inverted_pressure_add.append(pressure_add)
-                flow_rate_end += og_flowrate_end
-                og2_flowrate_end = sum(
-                    all_discharge_rate[v : len(all_discharge_rate) - 3]
+                og_flowrate_end += flow_rate_end
+                og1_flowrate_end = sum(
+                    all_discharge_rate[1 : no_of_sprinkler_on_branch_lines - 2]
                 )
+                # og2_flowrate_end = sum(
+                #     all_discharge_rate[v : len(all_discharge_rate) - 3]
+                # )
                 og2_flow_rate_end_corr = (
-                    og2_flowrate_end
+                    og1_flowrate_end
                     * ((all_pressure[len(all_pressure) - 1]) ** (1 / 2))
                     / (main_pressure[len(main_pressure) - 2]) ** (1 / 2)
                 )
                 v += 6
+                og_flowrate_end += og2_flow_rate_end_corr
             elif n == no_of_sprinkler_on_branch_lines - 2:
                 length = equiv_length_t(
                     l=DIST_OF_SPRINKLER_ON_BRANCH_LINES / 2,
@@ -308,6 +312,10 @@ for m in range(1, no_of_branch_lines + 1):
                         )
                         inverted_discharge_add = []
                         inverted_pressure_add = []
+                        og_flowrate_end += all_discharge_rate[
+                            len(all_discharge_rate) - 1
+                        ]
+                        flow_rate_end = og_flowrate_end
 
 
 print(all_discharge_rate)
