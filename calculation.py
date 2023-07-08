@@ -1,5 +1,6 @@
 import math
 
+
 # constants
 AREA = 1500.0  # float(input("research area of sprikler ="))
 # This is the remote test area
@@ -313,7 +314,7 @@ for m in range(1, no_of_branch_lines + 1):
                             inverted_flowrate.append(og2_flow_rate_end_corr)
                         if n == 1:
                             length = equiv_length_t(
-                                l=dist_between_branch_lines,
+                                l=DIST_OF_SPRINKLER_ON_BRANCH_LINES/2,
                                 d_1=br_line_int_dia,
                                 d_2=int_dia_sch40_1_5inch,
                                 fitt_equiv=t_fitt_sch40_1_5inch,
