@@ -1,8 +1,9 @@
 import pandas as pd
+import openpyxl
 import calculation as calc
 
 count = 1
-index = range(1, len(calc.all_pressure) - 1)
+index = range(1, len(calc.all_pressure)+1)
 heading = [
     "start node",
     "end node",
@@ -107,7 +108,6 @@ for n in index:
             p = calc.no_of_sprinkler_on_branch_lines + 1
         if p <= calc.no_of_sprinkler_on_branch_lines + 1:
             if p < calc.no_of_sprinkler_on_branch_lines - 2:
-                print(n)
                 entry = [
                     n,
                     n + 1,
@@ -154,6 +154,9 @@ for n in index:
                 headings_data.append(entry)
 
             elif p == calc.no_of_sprinkler_on_branch_lines:
+                print(count)
+                # print(n)
+                print(f"no of branch {calc.no_of_branch_lines}")
                 if count < calc.no_of_branch_lines:
                     length = calc.equiv_length_t(
                         l=calc.dist_between_branch_lines,
@@ -174,7 +177,7 @@ for n in index:
                         length,
                     ]
                     entry.append(entry[3] - entry[2])
-                    headings_data.append(entry)
+                headings_data.append(entry)
             elif p == calc.no_of_sprinkler_on_branch_lines + 1:
                 length = calc.equiv_length_t(
                     l=calc.DIST_OF_SPRINKLER_ON_BRANCH_LINES / 2,
@@ -196,11 +199,11 @@ for n in index:
                 headings_data.append(entry)
                 count += 1
 
+# print(headings_data)
+print(len(headings_data))
 
-print(headings_data)
 
-
-df = pd.DataFrame(headings_data, columns=heading, index=index)
+df = pd.DataFrame(headings_data, columns=heading, index=range(1, len(headings_data)+1))
 
 df.to_excel("pipe_data.xlsx", sheet_name="pipe_data")
 # index = np.arange(1, len(all_pressure)+1)
@@ -212,8 +215,8 @@ df.to_excel("pipe_data.xlsx", sheet_name="pipe_data")
 
 headings_data2 = []
 index2 = range(1, len(calc.all_pressure) + 1)
-print(len(calc.all_pressure))
-print(len(calc.all_discharge_rate))
+# print(len(calc.all_pressure))
+# print(len(calc.all_discharge_rate))
 heading2 = [
     "node point",
     "pressure",
@@ -221,11 +224,21 @@ heading2 = [
 ]
 for n in index:
     entry = [n, calc.all_pressure[n - 1], calc.all_discharge_rate[n - 1]]
-    
+
     headings_data2.append(entry)
 
-print(len(headings_data2))
-print(headings_data2)
-# df2 = pd.DataFrame(headings_data2, columns=heading2, index=index2)
+# print(len(headings_data2))
+# print(headings_data2)
+df2 = pd.DataFrame(headings_data2, columns=heading2, index=index2)
 
-append_df.to_excel("pipe_data.xlsx", df2)
+
+wb = openpyxl.Workbook()
+wb.create_sheet("pipe_data")
+wb.create_sheet("node_data")
+wb.save("pipe_data.xlsx")
+
+with pd.ExcelWriter("pipe_data.xlsx") as writer:
+    df.to_excel(writer, sheet_name="pipe_data", index=0)
+    df2.to_excel(writer, sheet_name="node_data", index=1)
+
+
