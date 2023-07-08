@@ -336,6 +336,8 @@ for m in range(1, no_of_branch_lines + 1):
                             len(all_discharge_rate) - 1
                         ]
                         flow_rate_end = og_flowrate_end
+                        # if m == no_of_branch_lines:
+                        #     all_flowrate.append(flow_rate_end)
 
 
 print(all_discharge_rate)
