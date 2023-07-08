@@ -97,9 +97,11 @@ while calc_coverage_area_check is True:
 
 all_discharge_rate = []
 flow_rate_end = 0
+all_flowrate = []
 all_pressure = []
 inverted_pressure_add = []
 inverted_discharge_add = []
+inverted_flowrate = []
 pressure_add = 0
 og_flowrate_end = 0
 v = 0
@@ -135,6 +137,7 @@ for m in range(1, no_of_branch_lines + 1):
         all_discharge_rate.append(node1_discharge_rate)
         pressure = node1_pressure
         flow_rate_end += node1_discharge_rate
+        all_flowrate.append(flow_rate_end)
         for n in range(2, no_of_sprinkler_on_branch_lines + 2):
             # if n == 1:
             #     p_drop = pressure_drop(
@@ -146,8 +149,8 @@ for m in range(1, no_of_branch_lines + 1):
             #     all_pressure.append(pressure)
             #     print(flow_rate_end)
 
-            if n < no_of_sprinkler_on_branch_lines - 1:
-                if n < no_of_sprinkler_on_branch_lines - 2:
+            if n < no_of_sprinkler_on_branch_lines:
+                if n < no_of_sprinkler_on_branch_lines - 1:
                     p_drop = pressure_drop(
                         q=flow_rate_end,
                         l_eqv=DIST_OF_SPRINKLER_ON_BRANCH_LINES,
@@ -157,6 +160,7 @@ for m in range(1, no_of_branch_lines + 1):
                     discharge = discharge_rate(p=pressure)
                     all_discharge_rate.append(discharge)
                     flow_rate_end += discharge
+                    all_flowrate.append(flow_rate_end)
                     all_pressure.append(pressure)
                     print(flow_rate_end)
                 else:
@@ -169,6 +173,7 @@ for m in range(1, no_of_branch_lines + 1):
                     discharge = discharge_rate(p=pressure)
                     all_discharge_rate.append(discharge)
                     flow_rate_end += discharge
+                    all_flowrate.append(flow_rate_end)
                     all_pressure.append(pressure)
                     print(flow_rate_end)
                 # junc_flowrate_end =flow_rate_end
@@ -205,17 +210,20 @@ for m in range(1, no_of_branch_lines + 1):
                     / (pressure_last + p_drop) ** (1 / 2)
                 )
                 all_discharge_rate.append(discharge_last)
+                all_flowrate.append(discharge_last)
                 p_drop = pressure_drop(
                     q=discharge_last, l_eqv=length, d=br_line_int_dia
                 )
                 all_pressure.append(all_pressure[len(all_pressure) - 1] - p_drop)
                 flow_rate_end += discharge_last  # corrected with 6
+
+        
                 main_pressure = all_pressure
                 main_discharge_rate = all_discharge_rate
 
     elif m > 1:
-        for n in range(no_of_sprinkler_on_branch_lines - 1, 0, -1):
-            if n == no_of_sprinkler_on_branch_lines - 1:
+        for n in range(no_of_sprinkler_on_branch_lines, 0, -1):
+            if n == no_of_sprinkler_on_branch_lines:
                 inverted_discharge_add.append(0)
                 # f1 corrected with 5-11 pressure drop
                 length = equiv_length_t(
@@ -228,8 +236,9 @@ for m in range(1, no_of_branch_lines + 1):
                 pressure_add = all_pressure[len(all_pressure) - 2] + p_drop
                 inverted_pressure_add.append(pressure_add)
                 og_flowrate_end += flow_rate_end
+                all_flowrate.append(og_flowrate_end)
                 og1_flowrate_end = sum(
-                    all_discharge_rate[1 : no_of_sprinkler_on_branch_lines - 2]
+                    all_discharge_rate[1 : no_of_sprinkler_on_branch_lines]
                 )
                 # og2_flowrate_end = sum(
                 #     all_discharge_rate[v : len(all_discharge_rate) - 3]
@@ -240,8 +249,9 @@ for m in range(1, no_of_branch_lines + 1):
                     / (main_pressure[len(main_pressure) - 2]) ** (1 / 2)
                 )
                 v += 6
+                inverted_flowrate.append(og2_flow_rate_end_corr)
                 og_flowrate_end += og2_flow_rate_end_corr
-            elif n == no_of_sprinkler_on_branch_lines - 2:
+            elif n == no_of_sprinkler_on_branch_lines - 1:
                 length = equiv_length_t(
                     l=DIST_OF_SPRINKLER_ON_BRANCH_LINES / 2,
                     d_1=br2_line_int_dia,
@@ -256,9 +266,10 @@ for m in range(1, no_of_branch_lines + 1):
                 discharge = discharge_rate(p=pressure_add)
                 inverted_discharge_add.append(discharge)
                 og2_flow_rate_end_corr -= discharge
+                inverted_flowrate.append(og2_flow_rate_end_corr)
 
-            elif n <= no_of_sprinkler_on_branch_lines - 3:
-                if n == no_of_sprinkler_on_branch_lines - 2:
+            elif n <= no_of_sprinkler_on_branch_lines - 2:
+                if n == no_of_sprinkler_on_branch_lines - 1:
                     p_drop = pressure_drop(
                         q=og2_flow_rate_end_corr,
                         l_eqv=DIST_OF_SPRINKLER_ON_BRANCH_LINES,
@@ -271,6 +282,7 @@ for m in range(1, no_of_branch_lines + 1):
                     discharge = discharge_rate(p=pressure_add)
                     inverted_discharge_add.append(discharge)
                     og2_flow_rate_end_corr -= discharge
+                    inverted_flowrate.append(og2_flow_rate_end_corr)
                 else:
                     p_drop = pressure_drop(
                         q=og2_flow_rate_end_corr,
@@ -284,6 +296,7 @@ for m in range(1, no_of_branch_lines + 1):
                     discharge = discharge_rate(p=pressure_add)
                     inverted_discharge_add.append(discharge)
                     og2_flow_rate_end_corr -= discharge
+                    inverted_flowrate.append(og2_flow_rate_end_corr)
                     if n == 1:
                         length = equiv_length_t(
                             l=dist_between_branch_lines,
@@ -295,6 +308,7 @@ for m in range(1, no_of_branch_lines + 1):
                             q=node1_discharge_rate, l_eqv=length, d=br_line_int_dia
                         )
                         all_pressure.extend(list(reversed(inverted_pressure_add)))
+                        all_flowrate.extend(list(reversed(inverted_flowrate)))
                         discharge = (
                             node1_discharge_rate
                             * (all_pressure[len(all_pressure) - 1]) ** (1 / 2)
@@ -304,6 +318,7 @@ for m in range(1, no_of_branch_lines + 1):
                             list(reversed(inverted_discharge_add))
                         )
                         all_discharge_rate.append(discharge)
+                        all_flowrate.append(discharge)
                         p_drop = pressure_drop(
                             q=discharge, l_eqv=length, d=br_line_int_dia
                         )
@@ -312,6 +327,7 @@ for m in range(1, no_of_branch_lines + 1):
                         )
                         inverted_discharge_add = []
                         inverted_pressure_add = []
+                        inverted_flowrate = []
                         og_flowrate_end += all_discharge_rate[
                             len(all_discharge_rate) - 1
                         ]
