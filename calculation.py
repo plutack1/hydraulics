@@ -1,5 +1,5 @@
 import math
-
+import gui_interface as gui
 
 # constants
 AREA = 1500.0  # float(input("research area of sprikler ="))
@@ -29,8 +29,6 @@ int_dia_sch40_3inch = 3.068  # float(input("cross line diameter"))
 t_fitt_sch40_3inch = 15
 t_fitt_sch40_2inch = 10
 t_fitt_sch40_1_5inch = 8
-l_equiv_main = 18.31  # float(input("equivaleth of cross main fitting"))
-l_equiv_branch = 30.66  # float(input("equivaleth of branch fitting"))
 k = 8  # int(input("sprinkler coefficient"))
 
 no_of_branch_lines = math.ceil(WIDTH / MAX_SPACING)
