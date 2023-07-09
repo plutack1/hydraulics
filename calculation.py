@@ -2,10 +2,26 @@ import math
 import gui_interface as gui
 
 # constants
-AREA = 1500.0  # float(input("research area of sprikler ="))
-# This is the remote test area
-LENGTH = 67.3  # float(input("Enter length and breadth of sprikler ="))
-WIDTH = 47.6  # float(input("Enter breadth of sprikler ="))
+for i,label_text in enumerate(gui.labels):
+    if label_text == "Design area selected (ft²):":
+        DESIGN_AREA = float(gui.text_boxes[i].get())
+    elif label_text == "Length of study area (ft):":
+        LENGTH = float(gui.text_boxes[i].get())
+    elif label_text == "Width of study area (ft):":
+        WIDTH = float(gui.text_boxes[i].get())
+    elif label_text == "Sprinkler coefficient:":
+        k = float(gui.text_boxes[i].get())
+    elif label_text == "occupancy hazard type":
+        if gui.dropdown_boxes[i].get() == "Ordinary Hazard (group 1)":
+            density = (0.03 * (3000 - DESIGN_AREA ) / 1500) + 0.12
+        elif gui.dropdown_boxes[i].get() == "Ordinary Hazard (group 2)":
+            (0.03 * (3000 - DESIGN_AREA ) / 1500) + 0.12
+        
+        
+# AREA = 1500  # float(input("research area of sprikler ="))
+# # This is the remote test area
+# LENGTH = 67.3  # float(input("Enter length and breadth of sprikler ="))
+# WIDTH = 47.6  # float(input("Enter breadth of sprikler ="))
 
 # This is the sesign area for density area graph
 MAX_COVERAGE = 120  # int(input("max_coverage of sprikler ="))
@@ -72,7 +88,7 @@ while calc_coverage_area_check is True:
             actual_length = (
                 min_sprinkler_on_branch - 0.5
             ) * DIST_OF_SPRINKLER_ON_BRANCH_LINES + last_sprinkler_wall_dist
-            width = AREA / actual_length
+            width = DESIGN_AREA / actual_length
             sprinkler_across_branch = math.ceil((width / dist_between_branch_lines))
             calc_design_area = actual_length * width
             add_node = 0
