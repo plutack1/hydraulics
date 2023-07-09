@@ -1,6 +1,15 @@
+import os
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+
+def file_exists(file_path):
+    return os.path.isfile(file_path)
+
+# Example usage
+
+
+
 
 
 def calculate():
@@ -17,7 +26,21 @@ def calculate():
             return  # Stop calculation if any dropdown box has no selection
 
     # Continue with your calculation logic here
+    
+    
+    if file_exists(file_path="pipe_data.xlsx"):
+        messagebox.showinfo("OK", "calculations completed successfully. ")
+    else:
+        messagebox.showerror("Error", "calculations did not complete successfully. Please check your inputs and try again.")
+
     pass
+
+
+
+
+
+
+
 
 
 # Create the main window
