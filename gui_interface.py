@@ -14,16 +14,7 @@ def file_exists(file_path):
 
 def calculate():
     # Check if any text box is blank
-    for text_box in text_boxes:
-        if text_box.get().strip() == "":
-            messagebox.showerror("Error", "Please fill in all the text boxes.")
-            return  # Stop calculation if any text box is empty
-
-    # Check if any dropdown box has no selection
-    for dropdown_box in dropdown_boxes:
-        if dropdown_box.get().strip() == "":
-            messagebox.showerror("Error", "Please select an option from all dropdown boxes.")
-            return  # Stop calculation if any dropdown box has no selection
+    
 
     # Continue with your calculation logic here
     
@@ -31,8 +22,19 @@ def calculate():
     if file_exists(file_path="pipe_data.xlsx"):
         messagebox.showinfo("OK", "calculations completed successfully. ")
     else:
-        messagebox.showerror("Error", "calculations did not complete successfully. Please check your inputs and try again.")
-
+        for i, text_box in enumerate(text_boxes):
+            if text_box.get().strip() == "":
+                    messagebox.showerror("Error", "Please fill in all the text boxes.")
+                    return  # Stop calculation if any text box is empty
+        
+        # Check if any dropdown box has no selection
+        for dropdown_box in dropdown_boxes:
+            if dropdown_box.get().strip() == "":
+                messagebox.showerror("Error", "Please select an option from all dropdown boxes.")
+                return  # Stop calculation if any dropdown box has no selection
+        if not 1500 <= float(text_boxes[0].get().strip()) <= 3000:
+                    messagebox.showerror("Error", "Design area range exceeded. Please refer to NFPA 13 for design area range.")
+                    return
     pass
 
 
