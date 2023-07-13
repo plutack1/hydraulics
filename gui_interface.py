@@ -2,102 +2,111 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import subprocess
+import calculation
+
+# import output
+
 
 def file_exists(file_path):
     return os.path.isfile(file_path)
 
-# Example usage
 
-
-
-
-
-def calculate():
-    # Check if any text box is blank
-    
-
-    # Continue with your calculation logic here
-    
-    
+def feedback():
     if file_exists(file_path="pipe_data.xlsx"):
         messagebox.showinfo("OK", "calculations completed successfully. ")
     else:
-        for i, text_box in enumerate(text_boxes):
-            if text_box.get().strip() == "":
-                    messagebox.showerror("Error", "Please fill in all the text boxes.")
-                    return  # Stop calculation if any text box is empty
-        
-        # Check if any dropdown box has no selection
-        for dropdown_box in dropdown_boxes:
-            if dropdown_box.get().strip() == "":
-                messagebox.showerror("Error", "Please select an option from all dropdown boxes.")
-                return  # Stop calculation if any dropdown box has no selection
-        if not 1500 <= float(text_boxes[0].get().strip()) <= 3000:
-                    messagebox.showerror("Error", "Design area range exceeded. Please refer to NFPA 13 for design area range.")
+        for i, (key, value) in enumerate(values.items()):
+            if value == "":
+                messagebox.showerror("Error", "Please fill in all all options.")
+                return  # Stop calculation if any text box is empty
+
+            if key == "Design area selected (ft²):":
+                if not 1500 <= float(value) <= 3000:
+                    messagebox.showerror(
+                        "Error",
+                        "Design area range exceeded. Please refer to NFPA 13 for design area range.",
+                    )
                     return
     pass
 
 
+class Gui(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
+        self.title("Hydraulics Calculation App")
 
+        self.rowconfigure(0, minsize=50)
+        self.rowconfigure(1, minsize=50)
+        self.rowconfigure(2, minsize=50)
+        self.rowconfigure(3, minsize=50)
 
-
-
-
-
-# Create the main window
-window = tk.Tk()
-window.title("GUI Example")
-
-# Set the window size and position
-# window.geometry("500x600")
-
-# Set the vertical spacing between rows
-window.rowconfigure(0, minsize=50)
-window.rowconfigure(1, minsize=50)
-window.rowconfigure(2, minsize=50)
-window.rowconfigure(3, minsize=50)
-
-labels = [
-    "Design area selected (ft²):",
-    "Length of study area (ft):",
-    "Width of study area (ft):",
-    "Sprinkler coefficient:",
-]
-# Create the labels and text boxes
-text_boxes = []
-
-for i, label_text in enumerate(labels):
-    label = tk.Label(window, text=label_text)
-    label.grid(row=i, column=0, sticky="e", padx=10, pady=10)
-
-    text_box = tk.Entry(window)
-    text_box.grid(row=i, column=1, padx=10, pady=10)
-    text_boxes.append(text_box)
-
-# Create the dropdown boxes
-dropdown_labels = [
-    "occupancy hazard type",
-]
-dropdown_boxes = []
-
-for i, dropdown_label in enumerate(dropdown_labels):
-    label = tk.Label(window, text=dropdown_label)
-    label.grid(row=i + (len(text_boxes) + 1), column=0, sticky="e", padx=10, pady=10)
-    if dropdown_label == "occupancy hazard type":
-        dropdown_values = [
-            "",
-            "Ordinary Hazard (group 1)",
-            "Ordinary Hazard (group 2)",
+        self.labels = [
+            "Design area selected (ft²):",
+            "Length of study area (ft):",
+            "Width of study area (ft):",
+            "Sprinkler coefficient:",
+            "Ceiling Elevation:",
+            "Distance to Tank location:"
         ]
-    dropdown_box = ttk.Combobox(window, values=dropdown_values)
-    dropdown_box.current(0)  # Set the default selection
-    dropdown_box.grid(row=i + (len(text_boxes) + 1), column=1, padx=20, pady=10, sticky="w")
-    dropdown_boxes.append(dropdown_box)
+        self.text_boxes = []
 
-# Create the calculate button
-button = tk.Button(window, text="Calculate", command=calculate)
-button.grid(row=len(text_boxes) + len(dropdown_boxes) + 1, column=0, columnspan=4, padx=10, pady=10)
+        for i, label_text in enumerate(self.labels):
+            label = tk.Label(self, text=label_text)
+            label.grid(row=i, column=0, sticky="e", padx=10, pady=10)
 
-# Start the main loop
-window.mainloop()
+            text_box = tk.Entry(self)
+            text_box.grid(row=i, column=1, padx=10, pady=10)
+            self.text_boxes.append(text_box)
+
+        self.dropdown_labels = [
+            "Occupancy hazard type",
+        ]
+        self.dropdown_boxes = []
+
+        for i, dropdown_label in enumerate(self.dropdown_labels):
+            label = tk.Label(self, text=dropdown_label)
+            label.grid(
+                row=i + (len(self.labels) + 1), column=0, sticky="e", padx=10, pady=10
+            )
+            if dropdown_label == "Occupancy hazard type":
+                dropdown_values = [
+                    "",
+                    "Ordinary Hazard (group 1)",
+                    "Ordinary Hazard (group 2)",
+                ]
+            dropdown_box = ttk.Combobox(self, values=dropdown_values)
+            dropdown_box.current(0)
+            dropdown_box.grid(
+                row=i + (len(self.labels) + 1), column=1, padx=20, pady=10, sticky="w"
+            )
+            self.dropdown_boxes.append(dropdown_box)
+
+        button = tk.Button(
+            self,
+            text="Calculate",
+            command=lambda: [
+                self.calculate_values(),
+            ],
+        )
+        button.grid(
+            row=len(self.labels) + len(self.dropdown_labels) + 1,
+            column=0,
+            columnspan=4,
+            padx=10,
+            pady=10,
+        )
+
+    def calculate_values(self):
+        values = {}
+        for i, label in enumerate(self.labels):
+            values[label] = self.text_boxes[i].get()
+        for i, dropdown_label in enumerate(self.dropdown_labels):
+            values[dropdown_label] = self.dropdown_boxes[i].get()
+        calculation.full_calc(values=values)
+
+
+# Create an instance of the Gui class and start the main loop
+gui = Gui()
+gui.mainloop()
